@@ -46,6 +46,7 @@ if submitted and story.strip():
         st.success("Audio generated!")
     except Exception as e:
         st.error(f"TTS generation failed: {e}")
+        st.warning("This language might not be supported for audio yet.")
     # Image card generation
     from PIL import Image, ImageDraw, ImageFont
     card_dir = os.path.join("data", "cards")
@@ -82,6 +83,7 @@ if submitted and story.strip():
         # Add name if provided
         if name.strip():
             draw.text((margin, 350), f"- {name.strip()}", font=body_font, fill=(100, 80, 60))
+        draw.rectangle([(5, 5), (795, 395)], outline=(150, 120, 100), width=3)
         img.save(card_path)
         with open(card_path, "rb") as f:
             st.download_button("Download Story Card", f, file_name=card_filename)
