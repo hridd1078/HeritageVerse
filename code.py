@@ -58,11 +58,15 @@ if submitted and story.strip():
         img = Image.new('RGB', (800, 400), color=(245, 235, 220))
         draw = ImageDraw.Draw(img)
         # Try to use a truetype font, fallback to default
-        try:
-            title_font = ImageFont.truetype("NotoSans-Bold.ttf", 36)
-            body_font = ImageFont.truetype("NotoSans-Regular.ttf", 28)
-        except:
-            title_font= body_font = ImageFont.load_default()
+        title_font = ImageFont.load_default()
+        if detected_lang == "te":
+            try:
+                body_font = ImageFont.truetype("NotoSansTelugu-Regular.ttf", 28)
+            except:
+                st.warning("Could not load Telugu font. Text may not render properly.")
+                body_font = ImageFont.load_default()
+        else:
+            body_font = ImageFont.load_default()
         # Draw "Story Card" title at the top center
         title_text = "Story Card"
         title_width = draw.textlength(title_text, font=title_font)
