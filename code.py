@@ -20,7 +20,12 @@ if submitted and story.strip():
     DetectorFactory.seed = 0
     try:
         detected_lang = detect(story)
-        st.success(f"Detected Language: {detected_lang}")
+        from langcodes import Language
+        try:
+            full_lang = Language.get(detected_lang).display_name()
+            st.success(f"Detected Language: {full_lang} ({detected_lang})")
+        except:
+            st.success(f"Detected Language: {detected_lang}")
     except Exception as e:
         st.error(f"Language detection failed: {e}")
         detected_lang = None
@@ -53,20 +58,30 @@ if submitted and story.strip():
         draw = ImageDraw.Draw(img)
         # Try to use a truetype font, fallback to default
         try:
-            font = ImageFont.truetype("NotoSans-Regular.ttf", 28)
+            title_font = ImageFont.truetype("NotoSans-Bold.ttf", 36)
+            body_font = ImageFont.truetype("NotoSans-Regular.ttf", 28)
         except:
-            font = ImageFont.load_default()
+            title_font= body_font = ImageFont.load_default()
+        # Draw "Story Card" title at the top center
+        title_text = "Story Card"
+        title_width = draw.textlength(title_text, font=title_font)
+        draw.text(
+        ((800 - title_width) // 2, 20),  # center horizontally, Y = 20px
+        title_text,
+        font=title_font,
+        fill=(90, 60, 30)
+        )
         # Word wrap the story text
         import textwrap
-        margin, offset = 40, 40
+        margin, offset = 40, 80
         for line in textwrap.wrap(story, width=40):
-            bbox = font.getbbox(line)
+            bbox = body_font.getbbox(line)
             line_height = bbox[3] - bbox[1]
-            draw.text((margin, offset), line, font=font, fill=(60, 40, 20))
+            draw.text((margin, offset), line, font=body_font, fill=(60, 40, 20))
             offset += line_height + 8
         # Add name if provided
         if name.strip():
-            draw.text((margin, 350), f"- {name.strip()}", font=font, fill=(100, 80, 60))
+            draw.text((margin, 350), f"- {name.strip()}", font=body_font, fill=(100, 80, 60))
         img.save(card_path)
         with open(card_path, "rb") as f:
             st.download_button("Download Story Card", f, file_name=card_filename)
